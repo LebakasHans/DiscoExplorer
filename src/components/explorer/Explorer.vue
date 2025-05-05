@@ -1,30 +1,68 @@
 <script setup lang="ts">
-import type { FolderStructureDto } from '~/models/folderStructure';
-import { getFolderStructure, getRootFolderStructure } from '~/services/api';
 import { currentFolderId } from '~/stores/folder';
-import LoadingSpinner from '../shared/LoadingSpinner.vue';
 
-const folderStructure = ref<FolderStructureDto>();
-const isLoading = ref(true);
+const isNavigatingViaHistory = ref(false);
+const filesToUpload = ref<File[]>([]);
+
+const { folderStructure, isLoading, updateFolderStructure } = useFolderStructure();
+
+watch(currentFolderId, (newId, oldId) => {
+  if (isNavigatingViaHistory.value) {
+    updateFolderStructure(newId);
+    return;
+  }
+
+  updateFolderStructure(newId);
+
+  if (newId !== oldId) {
+    if (oldId === undefined) {
+      history.replaceState({ folderId: newId }, '');
+    }
+    else {
+      history.pushState({ folderId: newId }, '');
+    }
+  }
+}, { immediate: false });
+
+function goToParentFolder() {
+  if (folderStructure.value?.parentFolderId !== undefined) {
+    currentFolderId.value = folderStructure.value.parentFolderId;
+  }
+  else if (currentFolderId.value !== null) {
+    currentFolderId.value = null;
+  }
+}
+
+function handlePopState(_event: PopStateEvent) {
+  isNavigatingViaHistory.value = true;
+  goToParentFolder();
+  nextTick(() => {
+    isNavigatingViaHistory.value = false;
+  });
+}
+
+function handleFilesDropped(files: File[]) {
+  filesToUpload.value = files;
+}
+
+function handleUploadComplete() {
+  filesToUpload.value = [];
+  updateFolderStructure();
+}
 
 onMounted(async () => {
-  isLoading.value = true;
-  const result = currentFolderId.value === null
-    ? await getRootFolderStructure()
-    : await getFolderStructure(currentFolderId.value);
+  await updateFolderStructure();
+  history.replaceState({ folderId: currentFolderId.value }, '');
+  window.addEventListener('popstate', handlePopState);
+});
 
-  if (result.isOk()) {
-    folderStructure.value = result.value;
-  }
-  else {
-    console.error('Failed to fetch root folder structure:', result.error);
-  }
-
-  isLoading.value = false;
+onUnmounted(() => {
+  window.removeEventListener('popstate', handlePopState);
 });
 </script>
 
 <template>
+  <DropZone @files-dropped="handleFilesDropped" />
   <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
     <ToolBar />
     <hr>
@@ -41,4 +79,9 @@ onMounted(async () => {
       message="Failed to load folder structure."
     />
   </div>
+  <UploadFilesDialog
+    v-if="filesToUpload.length > 0"
+    :files="filesToUpload"
+    @upload-complete="handleUploadComplete"
+  />
 </template>

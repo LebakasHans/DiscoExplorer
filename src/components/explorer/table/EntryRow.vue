@@ -2,8 +2,12 @@
 import type { ExplorerEntry } from '~/models/explorerEntry';
 import { DocumentIcon, FolderIcon } from '@heroicons/vue/24/outline';
 
-defineProps<{
+const props = defineProps<{
   entry: ExplorerEntry;
+}>();
+
+const emit = defineEmits<{
+  (e: 'dblclick', entry: ExplorerEntry): void;
 }>();
 
 function formatSize(size: number): string {
@@ -18,10 +22,17 @@ function formatSize(size: number): string {
     return `${(size / (1024 * 1024)).toFixed(2)} MB`;
   return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
+
+function onDoubleClick() {
+  emit('dblclick', props.entry);
+}
 </script>
 
 <template>
-  <tr>
+  <tr
+    class="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+    @dblclick="onDoubleClick"
+  >
     <td class="flex items-center space-x-2 max-w-xs">
       <DocumentIcon
         v-if="entry.isFile"

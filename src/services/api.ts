@@ -5,13 +5,17 @@ import { ResultAsync } from 'neverthrow';
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    let errorMessage = `HTTP error! status: ${response.status}, ${response.statusText}`;
     try {
       const errorData: SimpleResponse = await response.json();
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      if (errorData && errorData.message) {
+        errorMessage = errorData.message;
+      }
     }
-    catch {
-      throw new Error(`HTTP error! status: ${response.status}, ${response.statusText}`);
+    catch (e) {
+      console.warn('Could not parse error response body:', e);
     }
+    throw new Error(errorMessage);
   }
 
   const contentType = response.headers.get('content-type');
@@ -72,5 +76,48 @@ export function deleteFolder(folderId: string, recursive: boolean = false): Resu
       method: 'DELETE',
     },
     'Failed to delete folder',
+  );
+}
+
+export function getFile(fileId: string): ResultAsync<Blob, SimpleResponse> {
+  return ResultAsync.fromPromise(
+    fetch(`${useRuntimeConfig().public.BASE_URL}/file/${fileId}`).then((response) => {
+      if (!response.ok) {
+        return handleResponse<SimpleResponse>(response).then((errorData) => {
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        });
+      }
+      return response.blob();
+    }),
+    (error) => {
+      if (error instanceof Error && error.message) {
+        return { message: error.message };
+      }
+      return { message: 'Failed to download file' };
+    },
+  );
+}
+
+export function deleteFile(fileId: string): ResultAsync<SimpleResponse, SimpleResponse> {
+  return safeFetch<SimpleResponse>(
+    `/file/${fileId}`,
+    {
+      method: 'DELETE',
+    },
+    'Failed to delete file',
+  );
+}
+
+export function uploadFile(folderId: string, file: File): ResultAsync<SimpleResponse, SimpleResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  return safeFetch<SimpleResponse>(
+    `/file/${folderId}`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+    'Failed to upload file',
   );
 }
