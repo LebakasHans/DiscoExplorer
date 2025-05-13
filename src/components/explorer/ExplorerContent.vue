@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import type { ExplorerEntry } from '~/models/explorerEntry';
 import type { FolderStructureDto } from '~/models/folderStructure';
-import LoadingSpinner from '~/components/shared/LoadingSpinner.vue';
-import { getFile } from '~/services/api';
+import { deleteFile, deleteFolder, getFile } from '~/services/api';
 import { currentFolderId } from '~/stores/folder';
 
 defineProps<{
   folderStructure: FolderStructureDto;
 }>();
 
+const { updateFolderStructure } = useFolderStructure();
 const isDownloading = ref(false);
 const downloadingFileName = ref<string | null>(null);
+
+const { showToast } = useToastService();
 
 async function downloadFile(entry: ExplorerEntry) {
   isDownloading.value = true;
@@ -33,6 +35,9 @@ async function downloadFile(entry: ExplorerEntry) {
       console.error('Failed to download file:', result.error);
     }
   }
+  catch (error) {
+    console.error('Error during file download:', error);
+  }
   finally {
     isDownloading.value = false;
     downloadingFileName.value = null;
@@ -41,6 +46,44 @@ async function downloadFile(entry: ExplorerEntry) {
 
 function navigateFolder(entry: ExplorerEntry) {
   currentFolderId.value = entry.id;
+}
+
+async function handleDeleteFile(entry: ExplorerEntry) {
+  const result = await deleteFile(entry.id);
+
+  if (result.isOk()) {
+    showToast({
+      message: `${entry.name} deleted successfully`,
+      severity: 'success',
+    });
+  }
+  else {
+    showToast({
+      message: result.error.message,
+      severity: 'error',
+    }); ;
+  }
+
+  await updateFolderStructure();
+}
+
+async function handleDeleteFolder(entry: ExplorerEntry) {
+  const result = await deleteFolder(entry.id, false);
+
+  if (result.isOk()) {
+    showToast({
+      message: `${entry.name} deleted successfully`,
+      severity: 'success',
+    });
+  }
+  else {
+    showToast({
+      message: result.error.message,
+      severity: 'error',
+    }); ;
+  }
+
+  await updateFolderStructure();
 }
 </script>
 
@@ -69,6 +112,11 @@ function navigateFolder(entry: ExplorerEntry) {
           entry.isFile
             ? downloadFile(entry)
             : navigateFolder(entry);
+        }"
+        @delete="(entry: ExplorerEntry) => {
+          entry.isFile
+            ? handleDeleteFile(entry)
+            : handleDeleteFolder(entry);
         }"
       />
     </div>

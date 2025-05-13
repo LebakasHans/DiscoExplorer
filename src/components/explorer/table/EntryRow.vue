@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'dblclick', entry: ExplorerEntry): void;
+  (e: 'contextmenu', event: MouseEvent, entry: ExplorerEntry): void;
 }>();
 
 function formatSize(size: number): string {
@@ -32,6 +33,7 @@ function onDoubleClick() {
   <tr
     class="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
     @dblclick="onDoubleClick"
+    @contextmenu="emit('contextmenu', $event, entry)"
   >
     <td class="flex items-center space-x-2 max-w-xs">
       <DocumentIcon

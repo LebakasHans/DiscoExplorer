@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import type { Result } from 'neverthrow';
+import type { SimpleResponse } from '~/models/simpleResponse';
 import { uploadFile } from '~/services/api';
 import { currentFolderId } from '~/stores/folder';
 
 const props = defineProps<{
   files: File[];
 }>();
-
-const emit = defineEmits(['uploadComplete']);
+const emit = defineEmits<{
+  (e: 'uploadComplete', results: PromiseSettledResult<Result<SimpleResponse, SimpleResponse>>[]): void;
+}>();
 
 const uploading = ref(false);
 
@@ -16,17 +19,12 @@ async function handleUpload() {
 
   uploading.value = true;
 
-  for (const file of props.files) {
-    try {
-      await uploadFile(currentFolderId.value!, file);
-    }
-    catch (error) {
-      console.error(`Failed to upload ${file.name}:`, error);
-    }
-  }
+  const results = await Promise.allSettled(
+    props.files.map(file => uploadFile(currentFolderId.value!, file)),
+  );
 
   uploading.value = false;
-  emit('uploadComplete');
+  emit('uploadComplete', results);
 }
 
 function formatSize(size: number): string {

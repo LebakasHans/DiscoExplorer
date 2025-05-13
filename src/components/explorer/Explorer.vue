@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import type { Result } from 'neverthrow';
+import type { SimpleResponse } from '~/models/simpleResponse';
 import { currentFolderId } from '~/stores/folder';
 
 const isNavigatingViaHistory = ref(false);
 const filesToUpload = ref<File[]>([]);
 
 const { folderStructure, isLoading, updateFolderStructure } = useFolderStructure();
+const { showToast } = useToastService();
 
 watch(currentFolderId, (newId, oldId) => {
   if (isNavigatingViaHistory.value) {
@@ -45,9 +48,33 @@ function handleFilesDropped(files: File[]) {
   filesToUpload.value = files;
 }
 
-function handleUploadComplete() {
+function handleUploadComplete(results: PromiseSettledResult<Result<SimpleResponse, SimpleResponse>>[]) {
   filesToUpload.value = [];
   updateFolderStructure();
+
+  results.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      const response = result.value;
+      if (response.isOk()) {
+        showToast({
+          message: 'File uploaded successfully',
+          severity: 'success',
+        });
+      }
+      else {
+        showToast({
+          message: `Failed to upload file: ${response.error.message}`,
+          severity: 'error',
+        });
+      }
+    }
+    else {
+      showToast({
+        message: `Error during file upload: ${result.reason}`,
+        severity: 'error',
+      });
+    }
+  });
 }
 
 onMounted(async () => {
@@ -64,7 +91,7 @@ onUnmounted(() => {
 <template>
   <DropZone @files-dropped="handleFilesDropped" />
   <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
-    <ToolBar />
+    <ExplorerToolBar />
     <hr>
     <LoadingSpinner
       v-if="isLoading"
