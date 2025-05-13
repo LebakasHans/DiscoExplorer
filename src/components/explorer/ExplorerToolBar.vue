@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FolderPlusIcon } from '@heroicons/vue/24/outline';
+import { ArrowPathIcon, FolderPlusIcon } from '@heroicons/vue/24/outline';
 
 const showAddFolderDialog = ref(false);
 const { updateFolderStructure } = useFolderStructure();
@@ -28,5 +28,11 @@ function handleFolderCreated() {
       class="size-6 flex-shrink-0 hover:text-blue-500 cursor-pointer"
       @click="showAddFolderDialog = true"
     />
+    <div class="ml-auto">
+      <ArrowPathIcon
+        class="size-6 flex-shrink-0 hover:text-blue-500 cursor-pointer"
+        @click="updateFolderStructure()"
+      />
+    </div>
   </div>
 </template>

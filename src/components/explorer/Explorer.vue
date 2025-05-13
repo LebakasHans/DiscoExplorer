@@ -93,16 +93,21 @@ onUnmounted(() => {
   <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
     <ExplorerToolBar />
     <hr>
-    <LoadingSpinner
-      v-if="isLoading"
-      class="flex justify-center items-center h-full"
-    />
-    <ExplorerContent
-      v-else-if="folderStructure"
-      :folder-structure="folderStructure"
-    />
+    <div v-if="isLoading || folderStructure" class="flex w-full h-full">
+      <div class="w-1/5">
+        tmp
+      </div>
+      <LoadingSpinner
+        v-if="isLoading"
+        class="flex grow justify-center items-center h-full"
+      />
+      <ExplorerContent
+        v-else-if="folderStructure"
+        :folder-structure="folderStructure"
+      />
+    </div>
     <ExplorerErrorView
-      v-else
+      v-if="!folderStructure && !isLoading"
       message="Failed to load folder structure."
     />
   </div>
