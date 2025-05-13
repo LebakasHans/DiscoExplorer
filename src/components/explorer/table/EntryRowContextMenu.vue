@@ -13,7 +13,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <MyContextMenu :event="props.event" :entry="props.entry">
+  <BaseContextMenu :event="props.event" :entry="props.entry">
     <div>
       <button
         class="flex items-center space-x-2 text-red-600 hover:text-red-800"
@@ -23,5 +23,5 @@ const emit = defineEmits<{
         <span>Delete</span>
       </button>
     </div>
-  </MyContextMenu>
+  </BaseContextMenu>
 </template>
