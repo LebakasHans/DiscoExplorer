@@ -3,9 +3,15 @@ import { ResultAsync } from 'neverthrow';
 import { handleResponse, safeFetch } from './api';
 
 export function useFileService() {
+  const token = useCookie('token').value;
+
   const getFile = (fileId: string): ResultAsync<Blob, SimpleResponse> => {
     return ResultAsync.fromPromise(
-      fetch(`${useRuntimeConfig().public.BASE_URL}/file/${fileId}`).then((response) => {
+      fetch(`${useRuntimeConfig().public.BASE_URL}/file/${fileId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
         if (!response.ok) {
           return handleResponse<SimpleResponse>(response).then((errorData) => {
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);

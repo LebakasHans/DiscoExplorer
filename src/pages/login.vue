@@ -38,6 +38,10 @@ async function submitLogin() {
 }
 
 onMounted(async () => {
+  const tokenCookie = useCookie('token');
+  if (!tokenCookie.value) {
+    return;
+  }
   const result = await validate();
   result.match(
     () => {
