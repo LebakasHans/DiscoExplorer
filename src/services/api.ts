@@ -45,7 +45,7 @@ export function safeFetch<T>(
       },
     };
   }
-  
+
   return ResultAsync.fromPromise(
     fetch(url, options).then(handleResponse<T>),
     (error) => {
