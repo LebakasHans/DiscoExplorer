@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Result } from 'neverthrow';
 import type { SimpleResponse } from '~/models/simpleResponse';
-import { uploadFile } from '~/services/api';
+import { useFileService } from '~/services/fileApi';
 import { currentFolderId } from '~/stores/folder';
 
 const props = defineProps<{
@@ -11,6 +11,7 @@ const emit = defineEmits<{
   (e: 'uploadComplete', results: PromiseSettledResult<Result<SimpleResponse, SimpleResponse>>[]): void;
 }>();
 
+const { uploadFile } = useFileService(); ;
 const uploading = ref(false);
 
 async function handleUpload() {

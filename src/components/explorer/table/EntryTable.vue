@@ -11,6 +11,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'dblclick', entry: ExplorerEntry): void;
   (e: 'delete', entry: ExplorerEntry): void;
+  (e: 'attach', entry: ExplorerEntry): void;
 }>();
 
 const showContextMenu = ref(false);
@@ -77,6 +78,7 @@ onUnmounted(() => {
       :event="contextMenuEvent"
       :entry="contextMenuEntry"
       @delete="emit('delete', contextMenuEntry)"
+      @attach="emit('attach', contextMenuEntry)"
     />
   </div>
 </template>

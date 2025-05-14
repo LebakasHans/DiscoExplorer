@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { XMarkIcon } from '@heroicons/vue/24/outline';
-import { createFolder } from '~/services/api';
+import { useFolderService } from '~/services/folderApi';
 import { currentFolderId } from '~/stores/folder';
 
 const emit = defineEmits<{
   (e: 'folderCreated'): void;
 }>();
+
+const { createFolder } = useFolderService();
 
 const isShown = defineModel<boolean>('isShown', { required: true });
 const folderName = ref('');

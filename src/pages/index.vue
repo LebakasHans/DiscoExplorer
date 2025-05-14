@@ -86,29 +86,36 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('popstate', handlePopState);
 });
+
+definePageMeta({
+  middleware: ['auth'],
+  layout: 'with-menu',
+});
 </script>
 
 <template>
-  <DropZone @files-dropped="handleFilesDropped" />
-  <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
-    <ExplorerToolBar />
-    <hr>
-    <LoadingSpinner
-      v-if="isLoading"
-      class="flex grow justify-center items-center h-full"
-    />
-    <ExplorerContent
-      v-else-if="folderStructure"
-      :folder-structure="folderStructure"
-    />
-    <ExplorerErrorView
-      v-else
-      message="Failed to load folder structure."
+  <div class="flex items-center justify-center h-screen w-screen">
+    <DropZone @files-dropped="handleFilesDropped" />
+    <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
+      <ExplorerToolBar />
+      <hr>
+      <LoadingSpinner
+        v-if="isLoading"
+        class="flex grow justify-center items-center h-full"
+      />
+      <ExplorerContent
+        v-else-if="folderStructure"
+        :folder-structure="folderStructure"
+      />
+      <ExplorerErrorView
+        v-else
+        message="Failed to load folder structure."
+      />
+    </div>
+    <UploadFilesDialog
+      v-if="filesToUpload.length > 0"
+      :files="filesToUpload"
+      @upload-complete="handleUploadComplete"
     />
   </div>
-  <UploadFilesDialog
-    v-if="filesToUpload.length > 0"
-    :files="filesToUpload"
-    @upload-complete="handleUploadComplete"
-  />
 </template>

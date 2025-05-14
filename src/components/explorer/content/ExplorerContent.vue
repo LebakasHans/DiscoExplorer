@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ExplorerEntry } from '~/models/explorerEntry';
 import type { FolderStructureDto } from '~/models/folderStructure';
-import { deleteFile, deleteFolder, getFile } from '~/services/api';
+import { useFileService } from '~/services/fileApi';
+import { useFolderService } from '~/services/folderApi';
 import { currentFolderId } from '~/stores/folder';
 
 defineProps<{
@@ -9,10 +10,12 @@ defineProps<{
 }>();
 
 const { updateFolderStructure } = useFolderStructure();
+const { deleteFile, getFile } = useFileService();
+const { deleteFolder } = useFolderService();
+const { showToast } = useToastService();
+
 const isDownloading = ref(false);
 const downloadingFileName = ref<string | null>(null);
-
-const { showToast } = useToastService();
 
 async function downloadFile(entry: ExplorerEntry) {
   isDownloading.value = true;
@@ -50,10 +53,6 @@ async function downloadFile(entry: ExplorerEntry) {
     isDownloading.value = false;
     downloadingFileName.value = null;
   }
-}
-
-function navigateFolder(entry: ExplorerEntry) {
-  currentFolderId.value = entry.id;
 }
 
 async function handleDeleteFile(entry: ExplorerEntry) {
@@ -117,7 +116,7 @@ function handlePathNavigation(folderId: string) {
       @dblclick="(entry: ExplorerEntry) => {
         entry.isFile
           ? downloadFile(entry)
-          : navigateFolder(entry);
+          : handlePathNavigation(entry.id);
       }"
       @delete="(entry: ExplorerEntry) => {
         entry.isFile
