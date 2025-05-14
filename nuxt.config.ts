@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
   ],
   srcDir: 'src',
+  ssr: false,
 
   primevue: {
     components: {
