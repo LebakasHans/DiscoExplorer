@@ -44,7 +44,7 @@ function handlePopState(_event: PopStateEvent) {
   });
 }
 
-function handleFilesDropped(files: File[]) {
+function handleFileUpload(files: File[]) {
   filesToUpload.value = files;
 }
 
@@ -95,9 +95,9 @@ definePageMeta({
 
 <template>
   <div class="flex items-center justify-center h-screen w-screen">
-    <DropZone @files-dropped="handleFilesDropped" />
+    <DropZone @files-dropped="handleFileUpload" />
     <div class="flex flex-col border p-3 rounded-lg shadow-lg w-4/5 h-4/5 space-y-3 overflow-auto">
-      <ExplorerToolBar />
+      <ExplorerToolBar @file-upload="handleFileUpload" />
       <hr>
       <LoadingSpinner
         v-if="isLoading"

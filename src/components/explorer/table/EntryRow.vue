@@ -35,27 +35,27 @@ function onDoubleClick() {
     @dblclick="onDoubleClick"
     @contextmenu="emit('contextmenu', $event, entry)"
   >
-    <td class="flex items-center space-x-2 max-w-xs">
+    <td class="flex items-center space-x-2 px-2 py-1">
       <DocumentIcon
         v-if="entry.isFile"
-        class="size-6 flex-shrink-0"
+        class="size-5 flex-shrink-0"
       />
       <FolderIcon
         v-else
-        class="size-6 flex-shrink-0"
+        class="size-5 flex-shrink-0"
       />
       <span class="truncate" :title="entry.name">{{ entry.name }}</span>
     </td>
-    <td class="max-w-[100px]">
+    <td class="max-w-[100px] px-2 py-1 hidden sm:table-cell">
       <span class="truncate block" :title="entry.type">{{ entry.type }}</span>
     </td>
-    <td class="text-right">
+    <td class="text-right px-2 py-1 hidden sm:table-cell">
       {{ formatSize(entry.size) }}
     </td>
-    <td class="text-right">
+    <td class="text-right px-2 py-1 hidden md:table-cell">
       {{ new Date(entry.createdAt).toLocaleDateString() }}
     </td>
-    <td class="text-right">
+    <td class="text-right px-2 py-1 hidden md:table-cell">
       {{ new Date(entry.modifiedAt).toLocaleDateString() }}
     </td>
   </tr>

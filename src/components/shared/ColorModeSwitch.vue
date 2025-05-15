@@ -14,8 +14,8 @@ function toggleColorMode() {
     @click="toggleColorMode"
   >
     <ColorScheme placeholder="..." tag="span">
-      <SunIcon v-if="colorMode.value === 'dark'" class="w-5 h-5" />
-      <MoonIcon v-else class="w-5 h-5" />
+      <SunIcon v-if="colorMode.value === 'dark'" class="size-6" />
+      <MoonIcon v-else class="size-6" />
     </ColorScheme>
   </button>
 </template>

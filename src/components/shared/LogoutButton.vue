@@ -12,6 +12,6 @@ function logout() {
     class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
     @click="logout"
   >
-    <ArrowRightStartOnRectangleIcon class="w-5 h-5" />
+    <ArrowRightStartOnRectangleIcon class="size-6" />
   </button>
 </template>

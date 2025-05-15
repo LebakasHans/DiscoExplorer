@@ -41,23 +41,23 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <table class="min-w-full table-fixed">
+  <div class="overflow-x-auto">
+    <table class="w-full table-fixed">
       <thead>
         <tr>
-          <th class="w-1/3 px-2 py-1 text-left">
+          <th class="w-1/2 md:w-1/3 min-w-[120px] px-2 py-1 text-left">
             Name
           </th>
-          <th class="w-[100px] px-2 py-1 text-left">
+          <th class="w-16 md:w-[100px] min-w-[60px] px-2 py-1 text-left hidden sm:table-cell">
             Type
           </th>
-          <th class="w-[100px] px-2 py-1 text-right">
+          <th class="w-16 md:w-[100px] min-w-[50px] px-2 py-1 text-right hidden sm:table-cell">
             Size
           </th>
-          <th class="w-[120px] px-2 py-1 text-right">
+          <th class="w-20 md:w-[120px] min-w-[70px] px-2 py-1 text-right hidden md:table-cell">
             Created
           </th>
-          <th class="w-[120px] px-2 py-1 text-right">
+          <th class="w-20 md:w-[120px] min-w-[70px] px-2 py-1 text-right hidden md:table-cell">
             Modified
           </th>
         </tr>
