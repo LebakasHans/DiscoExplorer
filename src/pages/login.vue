@@ -27,7 +27,7 @@ async function submitLogin() {
   const result = await authenticate(hashedPassword);
   result.match(
     (authResponse) => {
-      const tokenCookie = useCookie('token');
+      const tokenCookie = useCookie('token', { secure: true, maxAge: 60 * 60 * 24 * 365 * 10 });
       tokenCookie.value = authResponse.token;
       navigateTo('/');
     },
